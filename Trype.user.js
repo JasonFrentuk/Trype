@@ -4,7 +4,6 @@
 // @version      1.0
 // @match        https://bloxd.io/*
 // @grant        none
-// @run-at       document-idle
 // ==/UserScript==
 
 let menuOpen = 0;
