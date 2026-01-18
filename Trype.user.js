@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Trype
 // @namespace    https://github.com/JasonFrentuk/Trype
-// @version      0.4
-// @description  Trype userscript
-// @match        bloxd.io
+// @version      1.0
+// @match        https://bloxd.io/*
 // @grant        none
+// @run-at       document-idle
 // ==/UserScript==
+
 let menuOpen = 0;
 let menuFS = 0;
 let legalOn = 0;
