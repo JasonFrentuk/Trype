@@ -2,10 +2,10 @@
 // @name         Trype
 // @namespace    https://github.com/JasonFrentuk/Trype
 // @version      1.0
-// @description  Runs like console paste
-// @match        https://bloxd.io/*
-// @run-at       document-idle
+// @description  Trype userscript
+// @match        *://*.bloxd.io/*
 // @grant        none
+// @run-at       document-idle
 // ==/UserScript==
 
 let menuOpen = 0;
