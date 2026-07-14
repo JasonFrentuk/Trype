@@ -1,13 +1,25 @@
-// ==UserScript==
-// @name         Trype
-// @namespace    https://github.com/JasonFrentuk/Trype
-// @version      1.0
-// @description  Trype userscript
-// @match        *://*.bloxd.io/*
-// @grant        none
-// @run-at       document-idle
-// ==/UserScript==
+function checkURL() {
+    if (location.href === "https://bloxd.io/") {
+        location.replace("https://jasonfrentuk.github.io/Trype/Home.html");
+    }
+}
 
+// This is for detecting when someone clicks one of the arrow things which is never
+window.addEventListener("popstate", checkURL);
+
+// If someone goes to bloxd.io from leaving the game or whatever
+for (const method of ["pushState", "replaceState"]) {
+    const original = history[method];
+
+    history[method] = function (...args) {
+        original.apply(this, args);
+        checkURL();
+    };
+}
+checkURL();
+
+// btw ts is not ai
+let draggableHealth = 1;
 let menuOpen = 0;
 let menuFS = 0;
 let legalOn = 0;
@@ -26,6 +38,7 @@ let showSocialsOn = 0;
 let showAmbiantOn = 0;
 let boostFPSon = 0;
 let armorOn = 0;
+let UpgradedChatOn = 0;
 // safe DOM setter
 function safeSetInner(id, html) {
     const el = document.getElementById(id);
@@ -96,8 +109,11 @@ document.body.appendChild(legal);
 
 
 const friday = document.createElement('div');
-friday.style.width = '30%';
-friday.style.height = '95.5vh';
+friday.style.width = '55vw';
+friday.style.height = '70vh';
+friday.style.left = '22.5vw';
+friday.style.top = '15vh';
+
 friday.style.overflow = 'auto';
 // old screen: --> friday.style.backgroundImage = 'url("https://i.ibb.co/vwmPL8F/Gradient.png")';
 friday.style.backgroundRepeat = 'no-repeat';
@@ -108,14 +124,13 @@ friday.style.fontFamily = 'sans-serif';
 friday.style.border = '1.32px solid rgb(86, 86, 86)';
 friday.style.backdropFilter = 'grayscale(100%)';
 friday.style.position = 'absolute';
-friday.style.left = '35%';
-friday.style.top = '2%';
 friday.style.zIndex = "9999";
 friday.style.borderRadius = '5px';
 friday.id = 'trype-menu';
 friday.innerHTML = `
     <div style="padding: 25px;" class="TMenu">
         <div class="navigator">
+            <h1 style="font-size: 41px;color: #f5f9ff;text-shadow: 0 0 6px rgba(56,134,255,0.95), 0 0 12px rgba(56,134,255,0.85), 0 0 20px rgba(56,134,255,0.7);">Trype</h1>
             <span class="navtext" id="UIselector" onclick="selector = 1; changeSelector();">UI</span>
             <span class="navtext" id="videoSelector" onclick="selector = 2; changeSelector();">Video</span>
             <span class="navtext" id="modsSelector" onclick="selector = 3; changeSelector();">Mods</span>
@@ -126,36 +141,30 @@ friday.innerHTML = `
                 <img class="FSIcon"src="https://cdn-icons-png.flaticon.com/512/483/483333.png">
             </div>
         </div>
-
         <div id="UIhideCard" class="container videoMod disabled" onclick="UI()">
             <p>GUI hide</p>
             <img class="img"src="https://i.ibb.co/y4VfWQ0/UIhide.png">
-            <p style="color: black;"> ━━━━━ </p>
         </div>
 
         <div id="BhideCard" class="container UImod disabled" onclick="clearBB()">
             <p>Hide Buttons</p>
             <img class="img"src="https://i.ibb.co/tXNCjxk/hide-Bad-Buttons.png" alt="hide-Bad-Buttons">
-            <p style="color: black;"> ━━━━━ </p>
         </div>
 
         <div id="KhideCard" class="container UImod disabled" onclick="HideKills()">
             <p>Hide Kills</p>
             <img class="img"src="https://i.ibb.co/3FFRdpb/hide-Kill-Messages.png" alt="hide-kills">
-            <p style="color: black;"> ━━━━━ </p>
         </div>
 
         <div id="crosshairsCard" class="container modMod disabled" onclick="crosshairsPlus()">
             <p>Crosshairs+</p>
-            <img class="img"src="https://i.ibb.co/SydSTHS/Crosshairs-Mod.png" alt="Crosshairs-Mod">
-            <p style="color: black;"> ━━━━━ </p>
+            <img class="img"src="https://i.ibb.co/SydSTHS/Crosshairs-Mod.png" alt="Crosshairs-Mod"><br>
             <input style="width: 60px;" class="button input"type="number" min="1" max="9" onclick="event.stopPropagation()" id="crosshairsPlusSelector">
         </div>
 
         <div id="hotbarsCard" class="container modMod disabled" onclick="hotbarsPlus()">
             <p>Inventory Theme</p>
             <img class="img"src="https://i.ibb.co/6rvRCHF/hotbars-Mod.png" alt="Hotbars-Mod">
-            <p style="color: black;"> ━━━━━ </p>
 
             <input class="button SmallInput"type="color" id="hotbarsPlusSelector" onclick="event.stopPropagation()">
             <input class="button SmallInput"type="color" id="hotbarsOutlinePlusSelector" onclick="event.stopPropagation()">
@@ -163,45 +172,48 @@ friday.innerHTML = `
             <input class="button SmallInput"type="color" id="selectedHotbarsPlusOutlineSelector" onclick="event.stopPropagation()">
         </div>
 
-        <div id="BlurMotionCard" class="container videoMod disabled" onclick="motionBlur()">
-            <p>Motion Blur</p>
-            <img class="img"src="https://i.ibb.co/2NZ5kwR/motion-Blur.png" alt="motion-Blur">
-            <p style="color: black;"> ━━━━━ </p>
+        <div id="upgradedChatCard" class="container UImod disabled" onclick="upgradedChat()">
+            <p>Upgraded Chat</p>
+            <img class="img"src="https://i.ibb.co/2NZ5kwR/motion-Blur.png" alt="upgraded-chat">
+
         </div>
 
         <div id="socialsCard" class="container UImod disabled" onclick="showSocials()">
             <p>Hide Socials</p>
             <img class="img"src="https://i.ibb.co/bJsvTwd/2.png" alt="SocialsHide">
-            <p style="color: black;"> ━━━━━ </p>
+
         </div>  
 
         <div id="keysCard" class="container videoMod disabled" onclick="keystrokes()">
             <p>Keystrokes</p>
             <img class="img"src="https://i.ibb.co/qFxhtf70/Keystrokes.png" alt="keys">
-            <p style="color: black;"> ━━━━━ </p>
+
         </div>  
 
         <div id="cpsCard" class="container videoMod disabled" onclick="cpsShow()">
             <p>CPS Counter</p>
             <img class="img"src="https://i.ibb.co/15Ln8KK/cps-Show-AT.png" alt="keys">
-            <p style="color: black;"> ━━━━━ </p>
+
         </div>  
 
         <div id="boostFPSCard" class="container modMod disabled" onclick="boostFPS()">
             <p>Boost FPS</p>
             <img class="img"src="https://i.ibb.co/VLHN94n/4.png" alt="fpsBoost">
-            <p style="color: black;"> ━━━━━ </p>
+
         </div>  
 
         <div id="filterCard" class="container modMod disabled" onclick="boostFPS()">
             <p>Filter</p>
             <img class="img"src="https://i.ibb.co/VLHN94n/4.png" alt="fpsBoost">
-            <p style="color: black;"> ━━━━━ </p>
+
         </div>
         <div id="armorCard" class="container modMod disabled" onclick="armor()">
             <p>Armor show</p>
             <img class="img"src="https://i.ibb.co/VLHN94n/4.png" alt="armorShow">
-            <p style="color: black;"> ━━━━━ </p>
+        </div>
+        <div id="draggableHealth" class="container modMod disabled" onclick="health()">
+            <p>Draggable Health</p>
+            <img class="img"src="https://i.ibb.co/VLHN94n/4.png" alt="armorShow">
         </div>
     </div>
 `;
@@ -257,7 +269,7 @@ function More() {
     }
 }
 
-const canvas = document.querySelector("canvas");
+const canvas = document.getElementById("noa-canvas");
 if (canvas) {
   canvas.width  = innerWidth * 0.5;
   canvas.height = innerHeight * 0.5;
@@ -278,14 +290,14 @@ elementsToHide.forEach(el => {
 
 const style = document.createElement("style");
 style.textContent = `
-    *:not(.keepUI):not(.crosshair):not(.MIcon):not(.FSIcon) {
+    *:not(.keepUI):not(.crosshair):not(.MIcon):not(.FSIcon):not(.container):not(.navtext) {
         animation: none !important;
         transition: none !important;
         box-shadow: none !important;
         filter: none !important;
         backdrop-filter: none !important;
     }
-    canvas, img {
+    #noa-canvas, img {
         image-rendering: pixelated !important; /* cheaper scaling */
         transform: translateZ(0);             /* force GPU layer */
         will-change: transform;                /* hint browser for smoother movement */
@@ -298,7 +310,10 @@ style.textContent = `
     ::-webkit-scrollbar {
         width: 9px;
     }
-
+    .trype-menu {
+        align-content: center;
+        width: 55vw;
+    }
     ::-webkit-scrollbar-track {
         box-shadow: inset 0 0 1px white;
         border-radius: 10px;
@@ -324,31 +339,48 @@ style.textContent = `
     }
     .TMenu {
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
         margin-top: 5vh;
         align-items: start;
         z-index: 100000;
-        width: 100% !important;
+        width: 80% !important;
         box-sizing: border-box;
     }
+            .TMenu {
+        margin-left: 200px;   /* matches navigator width */
+    }
+
+    .TMenu {
+        margin-left: 110px;
+        grid-template-columns: repeat(3, 1fr);
+    }
+
     .Menu.fs {
         grid-template-columns: repeat(5, 1fr) !important;
     }
 
     .navigator {
-        display: grid;
+        position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 25px;
-        background-color: transparent;
-        padding-bottom: 20px;
-        position: absolute;
-        grid-template-columns: repeat(5, 1fr);
-        text-align: center;
-        top: 15px;
+
+        width: 180px;               /* wider so text never wraps */
+        height: 97%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+
+        padding: 0px 16px 20px 16px;
+
+        background: rgba(0,0,0,0.45);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+        border-right: 1px solid rgba(255,255,255,0.1);
+
+        overflow: hidden;           /* important */
     }
+
     .FSIcon {
         position: absolute;
         z-index: 10002;
@@ -369,6 +401,12 @@ style.textContent = `
         right: 5vw;
         width: 30px;
     }
+        .MIcon, .FSIcon {
+    position: relative;
+    right: auto;
+    margin-top: auto;
+}
+
     .FSIcon:hover {
         filter: invert(1);
     }
@@ -414,20 +452,22 @@ style.textContent = `
     .BackLegal:hover {
         filter: invert(1);
     }
-    .navtext {
-        text-decoration-line: underline;
-        text-decoration-style: "solid";
-        text-decoration-color: rgba(235, 235, 235, 1);
-        text-decoration-thickness: 0px;
+.navtext {
+    transition: text-shadow ease-in-out 0.25s;
+    writing-mode: horizontal-tb;
+    transform: none;
 
-        margin-top: .7vh;
-        transition: text-shadow 0.2s ease-in-out;
-        text-shadow: 0 0 0px #c9c9c9ff, 0 0 0px #b7b7b7ff;
-        color: #dbdbdb;
-        font-weight: 525;
-        margin-left: 15%;
-        font-size: 20px;
-    }
+    white-space: nowrap;        /* NO wrapping */
+    width: 100%;
+
+    font-size: 18px;
+    margin: 0;
+    padding: 6px 10px;
+
+    text-align: left;
+}
+
+
     .navtext:hover {
         text-shadow: 
             0 0 2px rgba(233, 240, 255, 0.9),
@@ -455,15 +495,17 @@ style.textContent = `
         line-height: 1.2;
         border-radius: 7px;
         background-color: rgba(0,0,0,0.43);
-        width: 100%;             /* fill grid cell */
+        width: 10vw;             /* fill grid cell */
         box-sizing: border-box;
         min-height: 110px;       /* reasonable minimum height */
         height: auto;            /* allow content to determine height */
         text-align: center;
+        margin-left: 5vw;5
         padding: 10px;
         position: relative;
         border: 5px solid #ef4444; /* default red border */
         cursor: pointer;
+        padding-bottom: 35px;
     }
 
     .container.enabled { border-color: #22c55e !important; }
@@ -478,7 +520,7 @@ style.textContent = `
             0 0 10px rgba(255,255,255,0.7);
     }
 
-    .input { width: 100px; margin-bottom: 7px; }
+    .input { width: 100px; margin-top: 7px; }
     .SmallInput { width: 30px; margin-bottom: 5px; }
     .button { transition: box-shadow .2s, border-radius .6s, border .6s; }
     .button:hover { cursor: pointer; }
@@ -495,6 +537,11 @@ style.textContent = `
         border-radius: 10px;
         box-shadow: rgb(43, 59, 119) 0px 0px 15px 0px;
     }
+        .SelectedNav {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 `;
 document.head.appendChild(style);
 
@@ -525,7 +572,7 @@ document.addEventListener('keydown', function(event) {
         if (menuOpen == 0) {
 
             //Close the menu that was opened and show it
-            document.getElementsByClassName('EverythingMenu')[0].style.display = 'block';
+            document.getElementsByClassName('EverythingMenu')[0].style.display = 'flex';
             document.dispatchEvent(oKeyDown);
             setTimeout(() => {
                 document.dispatchEvent(oKeyUp);
@@ -592,10 +639,42 @@ function changeSelector() {
     }
 }
 function loop() {
-    crosshairsPlus();
-    setTimeout(() => {
-        crosshairsPlus();
-    }, 5);
+
+    document.querySelectorAll(".AvailableGame").forEach(el => {
+        el.style.borderRadius = "10px";
+        el.style.backgroundColor = "#2a2e32";
+    });
+
+    const title = document.getElementsByClassName("Title")[0];
+    if (title) title.innerText = "Trype";
+
+    const selectorEl = document.getElementById("crosshairsPlusSelector");
+    const chosen = selectorEl && selectorEl.value ? String(selectorEl.value) : "1";
+    const mapping = {
+        "1":"https://i.ibb.co/1MYHK3G/crosshair2.png",
+        "2":"https://i.ibb.co/kmF2K9n/crosshair4.png",
+        "3":"https://i.ibb.co/gSRck2X/crosshair5.png",
+        "4":"https://i.ibb.co/ygBX2GL/crosshair6.png",
+        "5":"https://i.ibb.co/CK79SD8/crosshair7.png",
+        "6":"https://i.ibb.co/kXQFyPS/crosshair8.png",
+        "7":"https://i.ibb.co/7nBzrdq/crosshair9.png",
+        "8":"https://i.ibb.co/nqk2zhSv/Bloxd-Sweat-png.png",
+        "9":"https://i.ibb.co/S4qhnRTX/Screenshot-2026-01-24-at-10-46-37-Penguin-Mod-Editor-removebg-preview.png"
+    };
+
+    const GameCrosshair = document.getElementsByClassName('Crosshair')[0];
+    if (!GameCrosshair) return;
+    if (crosshairsPlusOn == 1) {
+        GameCrosshair.style.backgroundImage = `url(${mapping[chosen] || mapping["1"]})`;
+        GameCrosshair.style.backgroundRepeat = "no-repeat";
+        GameCrosshair.style.backgroundSize = "contain";
+        GameCrosshair.style.width = "20px";
+        GameCrosshair.style.height = "20px";
+        GameCrosshair.textContent = "";
+    } else {
+        GameCrosshair.style.backgroundImage = '';
+        GameCrosshair.innerHTML = '+';
+    }
     updateDisplay();
 }
 
@@ -764,6 +843,15 @@ function UI() {
         UItoggle = 0;
     }
 }
+function health() {
+    if (draggableHealth == 0) {
+        document.getElementById('draggableHealth').classList.add('enabled'); document.getElementById('draggableHealth').classList.remove('disabled');
+        draggableHealth = 1;
+    } else {
+        document.getElementById('draggableHealth').classList.remove('enabled'); document.getElementById('draggableHealth').classList.add('disabled');
+        draggableHealth = 0;
+    }
+}
 function clearBB() {
     hideBB = hideBB ? 0 : 1;
 
@@ -852,13 +940,14 @@ function crosshairsPlus() {
     const selectorEl = document.getElementById("crosshairsPlusSelector");
     const chosen = selectorEl && selectorEl.value ? String(selectorEl.value) : "1";
     const mapping = {
-        "1":"https://i.ibb.co/1MYHK3G/crosshair2.png",
+        "1":"https://i.ibb.co/nqk2zhSv/Bloxd-Sweat-png.png",
         "2":"https://i.ibb.co/kmF2K9n/crosshair4.png",
         "3":"https://i.ibb.co/gSRck2X/crosshair5.png",
         "4":"https://i.ibb.co/ygBX2GL/crosshair6.png",
         "5":"https://i.ibb.co/CK79SD8/crosshair7.png",
         "6":"https://i.ibb.co/kXQFyPS/crosshair8.png",
-        "7":"https://i.ibb.co/7nBzrdq/crosshair9.png"
+        "7":"https://i.ibb.co/7nBzrdq/crosshair9.png",
+        "8":"https://i.ibb.co/S4qhnRTX/Screenshot-2026-01-24-at-10-46-37-Penguin-Mod-Editor-removebg-preview.png"
     };
 
     const GameCrosshair = document.getElementsByClassName('Crosshair')[0];
@@ -920,7 +1009,7 @@ function showSocials() {
     document.getElementById('socialsCard').classList.toggle('enabled', showSocialsOn==1);
     document.getElementById('socialsCard').classList.toggle('disabled', showSocialsOn==0);
     const social = document.getElementById('SocialBarOuter');
-    if (social) social.style.display = showSocialsOn == 1 ? 'block' : 'none';
+    if (social) social.style.display = showSocialsOn == 1 ? 'none' : 'block';
 }
 function boostFPS() {
     boostFPSon = boostFPSon ? 0 : 1;
@@ -932,7 +1021,7 @@ function boostFPS() {
             canvas.width = window.innerWidth * 1;
             canvas.height = window.innerHeight * 1;
         } else {
-            const canvas = document.querySelector("canvas");
+            const canvas = document.getElementById('noa-canvas');
             if (canvas) {
                 canvas.width  = innerWidth * 0.5;
                 canvas.height = innerHeight * 0.5;
@@ -1023,3 +1112,227 @@ function updateDisplay() {
         ArmorDisplay.appendChild(clone);
     });
 }
+
+
+//home screen
+
+setTimeout(() => {
+  const style = document.createElement("style");
+  style.textContent = `
+.SocialBarBody {
+  border-radius: 10px;
+}
+.AvailableGame {
+  border-radius: 10px;
+}
+ThumbnailBadgesContainer {
+  display: none !important;
+}
+.AvailableGameCCU {
+  background: transparent !important;
+}
+.AvailableGameText {
+  width: 100%;
+  background: transparent !important;
+}
+.AdBanner {
+  visibility: hidden !important;
+}
+.HomeHeaderRightContainer {
+  visibility: hidden !important;
+}
+body {
+  font-family: 'Trebuchet MS', sans-serif;
+}
+.Title {
+  color: #ffffff;
+  margin-top: 22px;
+  text-shadow:
+    0 0 3px rgba(255,255,255,0.7),
+    0 0 10px rgba(90,160,255,0.6),
+    0 0 22px rgba(90,160,255,0.45) !important;
+}
+.ThumbnailBadgeContainer {
+  visibility: hidden !important;
+}
+`;
+  document.head.appendChild(style);
+
+  document.querySelectorAll(".AvailableGame").forEach(el => {
+    el.style.borderRadius = "10px";
+    el.style.backgroundColor = "#2a2e32";
+  });
+
+  const title = document.getElementsByClassName("Title")[0];
+  if (title) title.innerText = "Trype";
+}, 1000);
+
+
+
+
+
+
+// 1. Colors
+const colors = ["#f33","orange","#f7ffa2ff","#5add5a","#338bff","#912fd7ff","violet","pink","#b15f46ff","#a1a1a1"];
+
+// 2. Hash
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+// 3. Deterministic color
+function stringToColor(str) {
+  const hash = hashString(str);
+  return colors[hash % colors.length];
+}
+
+// 4. Highlight logic for one MessageWrapper
+function highlightMessageWrapper(wrapper) {
+    const parentChild = wrapper.children[0];
+    if (!parentChild) return;
+
+    // Collect non-empty children
+    const textChildren = Array.from(parentChild.children).filter(
+        child => child.textContent.trim() !== ''
+    );
+
+    // Skip wrapper if none contain ":"
+    const hasColon = textChildren.some(child => child.textContent.includes(':'));
+    if (!hasColon) return;
+
+    for (let i = 0; i < textChildren.length; i++) {
+        let text = textChildren[i].textContent.trim();
+        if (text === '[' || text === ']') continue;
+
+        // Highlight first child
+        textChildren[i].style.color = stringToColor(text);
+
+        // If it is bracketed, also highlight the next sibling text
+        if (text.startsWith('[') && text.endsWith(']') && i + 1 < textChildren.length) {
+            // Skip empty or bracket-only
+            let next = textChildren[i + 1];
+            while(next && (next.textContent.trim() === '' || next.textContent.trim() === '[' || next.textContent.trim() === ']')) {
+                i++;
+                if(i+1 < textChildren.length) next = textChildren[i+1];
+                else break;
+            }
+            if(next) next.style.color = stringToColor(next.textContent.trim());
+        }
+
+        break; // done with first real text
+    }
+}
+
+// 5. Highlight existing wrappers
+const existingWrappers = document.getElementsByClassName('MessageWrapper');
+for (let wrapper of existingWrappers) {
+    highlightMessageWrapper(wrapper);
+}
+
+// 6. Observe for new MessageWrappers
+const chatContainer = document.getElementsByClassName('ChatMessages')[0];
+if (chatContainer) {
+    const observer = new MutationObserver(mutations => {
+        for (let mutation of mutations) {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(node => {
+                    if (UpgradedChatOn == 1) {
+                        if (node.classList && node.classList.contains('MessageWrapper')) {
+                            highlightMessageWrapper(node);
+                            document.getElementsByClassName('ChatMessages')[0].style.borderRadius = '10px';document.getElementsByClassName('ChatMessages')[0].style.background = '#22283b99';
+                        }
+                    }
+                });
+            }
+        }
+    });
+    observer.observe(chatContainer, { childList: true });
+}
+function upgradedChat() {
+    UpgradedChatOn = UpgradedChatOn ? 0 : 1;
+    document.getElementById('upgradedChatCard')
+        ?.classList.toggle('enabled', UpgradedChatOn === 1);
+    document.getElementById('upgradedChatCard')
+        ?.classList.toggle('disabled', UpgradedChatOn === 0);
+}
+let box;
+let menu;
+let ncanvas;
+
+let draggingHealth = false;
+let movedHealth = false;
+let startMouseXHealth = 0;
+let startMouseYHealth = 0;
+let startTransformXHealth = 0;
+let startTransformYHealth = 0;
+
+function waitForElements() {
+    box = document.querySelector(".BottomScreenStatBarBackground");
+    menu = document.querySelector(".EverythingMenuContainer");
+    ncanvas = document.getElementById("noa-canvas");
+
+    if (!box || !canvas || !menu) {
+        requestAnimationFrame(waitForElements);
+        return;
+    }
+
+    setup();
+}
+
+function setup() {
+    ncanvas.addEventListener("mousedown", (e) => {
+        const rect = box.getBoundingClientRect();
+
+        if (
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom
+        ) {
+            draggingHealth = true;
+            movedHealth = false;
+
+            startMouseXHealth = e.clientX;
+            startMouseYHealth = e.clientY;
+
+            const matrix = new DOMMatrix(getComputedStyle(box).transform);
+            startTransformXHealth = matrix.m41;
+            startTransformYHealth = matrix.m42;
+        }
+    });
+
+    ncanvas.addEventListener("mousemove", (e) => {
+        if (!draggingHealth) return;
+
+        const dx = e.clientX - startMouseXHealth;
+        const dy = e.clientY - startMouseYHealth;
+
+        if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+
+        movedHealth = true;
+
+        box.style.transform =
+            `translate(${startTransformXHealth + dx}px, ${startTransformYHealth + dy}px)`;
+    });
+
+    ncanvas.addEventListener("mouseup", () => {
+        draggingHealth = false;
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "AltLeft") {
+            if (typeof draggableHealth !== "undefined" && draggableHealth == 1) {
+                menu.style.visibility =
+                    menu.style.visibility === "hidden" ? "visible" : "hidden";
+            } else {
+                menu.style.visibility = "visible";
+            }
+        }
+    });
+}
+
+waitForElements();
