@@ -24,13 +24,12 @@ body{
 .bg{
     position:fixed;
     inset:0;
-    background-size: cover;
-    background-repeat: no-repeat;
     z-index:-2;
+}
+/*
     background:
         linear-gradient(rgba(8, 12, 22, 0.87),rgba(8, 12, 22, 0.59)), url("/home/nathan/Downloads/file.png") center/cover no-repeat
-}
-
+*/
 #title{
     transition: text-shadow 0.3s ease-in-out;
     cursor: pointer;
@@ -418,7 +417,7 @@ box-shadow:
 </div>
 <div class="titlediv">
     <div class="logo-card">
-        <img id="logo" src="file:///home/nathan/Downloads/LogoTransparent-removebg-preview.png">
+        <img id="logo" src="LogoTransparent.png">
     </div>
     <h1 id="title">Trype</h1>
 </div>
@@ -446,7 +445,7 @@ let wallpapers = [
     "file5.png",
     "file6.png"
 ]
-document.getElementsByClassName('bg')[0].style.background = `linear-gradient(rgba(8, 12, 22, 0.87),rgba(8, 12, 22, 0.59)), url('${wallpapers[Math.floor(Math.random() * 7)]}')`;
+document.getElementsByClassName('bg')[0].style.background = `linear-gradient(rgba(8, 12, 22, 0.87),rgba(8, 12, 22, 0.59)), url('${wallpapers[Math.floor(Math.random() * 7)]}') center/cover no-repeat`;
 let gamemode = undefined;
 let playShown = 0;
 let selectShown = 0;
