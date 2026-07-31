@@ -1,0 +1,7 @@
+Copyright (c) 2026 Jelix
+
+All rights reserved.
+
+This source code is proprietary and may not be copied, modified,
+distributed, published, sold, or used in any way without
+explicit written permission from the copyright holder.
